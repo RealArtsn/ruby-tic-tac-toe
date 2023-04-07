@@ -81,6 +81,17 @@ module HandleBoard
       matching_value = match_value(column)
       return matching_value if matching_value.positive?
     end
+    # criss cross not possible if middle seat isn't taken
+    return 0 if board[1][1] == 0
+    # check if criss or cross match
+    criss = [board[0][0], board[1][1], board[2][2]]
+    cross = [board[2][0], board[1][1], board[0][2]]
+    [criss, cross].each do |row|
+      p row
+      matching_value = match_value(row)
+      p 'Matching?' + matching_value.to_s
+      return matching_value if matching_value.positive?
+    end
     0
   end
 end
