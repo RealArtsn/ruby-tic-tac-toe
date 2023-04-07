@@ -27,6 +27,7 @@ module HandleBoard
 
     board[row][column] = player
   end
+
   # convert numpad to index
   def numpad_to_index(numpad)
     row = 2 - ((numpad - 1) / 3)
@@ -34,17 +35,19 @@ module HandleBoard
     [row, column]
   end
 
+  # return matching value if all values in array match
+  def match_value(array)
+    return array[0] if array.uniq.length == 1
+    # if not matching return -1
+    -1
+  end
+  
   def find_winner(_board)
     # initialize array to store columns for winner check
     columns = [[], [], []]
     col_idx = 0
-    # return value if all values in array match
-    def match_value(array)
-      return array[0] if array.uniq.length == 1
-
-      # if not matching return -1
-      -1
-    end
+    # initialize variable for counting empty spaces
+    empty_spaces = 9
     _board.each_with_index do |row, _row_idx|
       # return the value if row is all same and not zero
       matching_value = match_value(row)
@@ -53,6 +56,7 @@ module HandleBoard
       # construct arrays of columns for matching later
       row.each_with_index do |place, col_idx|
         columns[col_idx].push(place)
+        empty_spaces -= 1 if place.zero?
       end
     end
     columns.each do |column|
@@ -61,7 +65,8 @@ module HandleBoard
       return matching_value if matching_value.positive?
     end
     # criss cross not possible if middle seat isn't taken
-    return 0 if board[1][1] == 0
+    return 0 if (board[1][1]).zero?
+
     # check if criss or cross match
     criss = [board[0][0], board[1][1], board[2][2]]
     cross = [board[2][0], board[1][1], board[0][2]]
@@ -69,6 +74,11 @@ module HandleBoard
       matching_value = match_value(row)
       return matching_value if matching_value.positive?
     end
+
+    # return -1 if tie game
+    return -1 if empty_spaces == 9
+
+    # return 0 for no winner
     0
   end
 end
@@ -77,14 +87,12 @@ class Game
   include HandleBoard
   # start game
   def start
-    # initialize player variable
-    player = 2 # swaps to 1 in play_turn
     # begin first turn before loop
     play_turn
     loop do
       # check for winner
       winner = find_winner(board)
-      if winner.positive?
+      if winner != 0
         print_board
         print_winner(winner)
         break
@@ -103,7 +111,7 @@ class Game
       [0, 0, 0]
     ]
   end
-  attr_reader :board, :already_placed
+  attr_reader :board
   attr_accessor :player
 
   def print_board
@@ -111,6 +119,10 @@ class Game
   end
 
   def print_winner(winner)
+    if winner == -1
+      puts "It's a tie!"
+      return
+    end
     winner_char = winner == 1 ? 'x' : 'o'
     puts "#{winner_char} wins!"
   end
