@@ -27,31 +27,10 @@ module HandleBoard
 
     board[row][column] = player
   end
-
+  # convert numpad to index
   def numpad_to_index(numpad)
-    # messy translation from numpad to board
-    # row = nil
-    # column = nil
-    case numpad
-    when 1 then row = 2
-                column = 0
-    when 2 then row = 2
-                column = 1
-    when 3 then row = 2
-                column = 2
-    when 4 then row = 1
-                column = 0
-    when 5 then row = 1
-                column = 1
-    when 6 then row = 1
-                column = 2
-    when 7 then row = 0
-                column = 0
-    when 8 then row = 0
-                column = 1
-    when 9 then row = 0
-                column = 2
-    end
+    row = 2 - ((numpad - 1) / 3)
+    column = (numpad - 1) % 3
     [row, column]
   end
 
